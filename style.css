@@ -1,0 +1,8 @@
+
+
+#boards > div{ width: 400px; display: inline-block; margin: 1rem;}
+
+.cell{ width: 48px; height: 48px; border: 1px solid #333; float: left;}
+.cell:hover{ background-color: #ccc;}
+
+.cell.shipped{ background-color: green;}
