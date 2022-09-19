@@ -6,3 +6,24 @@
 .cell:hover{ background-color: #ccc;}
 
 .cell.shipped{ background-color: green;}
+
+.cell.light{ border-color: rgba(13, 167, 64, 0.2);
+    -webkit-box-shadow: 0 0 4px 4px rgba(13, 167, 64, 0.2);
+    box-shadow: 0 0 4px 4px rgba(13, 167, 64, 0.2);}
+
+.btnChangePos{ width: 40px; height: 40px; cursor: pointer; background-color: #333;}
+
+/*/////////////////////////// */
+/* MSG */
+.msg{ position: absolute;
+    display: none;
+    width: 600px;
+    bottom: 0;
+    left: 50%;
+    z-index: 1;
+    padding: 8px;
+    background: #ccc;
+    border-radius: 8px;
+    margin: 0 0 1rem -300px
+    }
+.msg.visible{ display: block;}
