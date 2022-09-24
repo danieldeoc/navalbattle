@@ -1,0 +1,25 @@
+					Horizontal	Vertical
+luz sobreposição de mouse U	=	OK		Ñ se aplica
+luz sobreposição de mouse M	=	OK		OK
+Marcação do lugar U		=	OK		Não se aplica
+Marcação do lugar M		=	OK		BUG nas ultimas linhas (efeito e marcacao)
+Quebra de linha			=	OK		defeito ultimas linhas
+Validação de lugar		=	OK		OK
+
+
+
+- Anular sobreposição de lugar ao final de linhas Horizontal e Vertical
+- falha na adição do lugar 63
+- notado bug não reproduzido com relação a quebra de linha horizontal (dá alerta mas conta como adicionado
+- remover mensagem
+
+- criar historico de placments e jogadas com desfazer
+
+- aplicar Design =>
+	- Loader
+	- Intro
+	- Boards
+	- Game effects
+	- Game Sound
+
+

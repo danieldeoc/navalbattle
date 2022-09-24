@@ -8,11 +8,13 @@
 .cell.shipped{ background-color: green;}
 
 .cell.light{ border-color: rgba(13, 167, 64, 0.2);
-    background: red;
+    background: purple;
     -webkit-box-shadow: 0 0 4px 4px rgba(13, 167, 64, 0.2);
     box-shadow: 0 0 4px 4px rgba(13, 167, 64, 0.2);}
 
-.btnChangePos{ width: 40px; height: 40px; cursor: pointer; background-color: #333;}
+.cell.light.cell.shipped{ background-color: red !important;}    
+
+.btnChangePos{ width: 40px; height: 40px; cursor: pointer; background-color: #333; color: white;}
 
 /*/////////////////////////// */
 /* MSG */

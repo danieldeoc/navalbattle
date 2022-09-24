@@ -1,12 +1,16 @@
-const root = document.getElementById("root");
-let gameStep = 0;
-const playerShips = new Set([]);
-const aiShip = new Set([]);
-let playerTime = "p";
-let shipPlacement = 0;
-let placebeShips = 15;
-let placedShips = 0;
-let modePlacement = "horizontal";
+const root = document.getElementById("root"); // root
+let gameStep = 0; // etapa do jogo
+const playerShips = new Set([]); // navios do Player
+const aiShip = new Set([]); // navios do AI
+let playerTime = "p";   // controla a vez do jogador
+let shipPlacement = 0;  // posicao da disposicao
+let placebeShips = 15; // numero de navios colocaveis
+let placedShips = 0; // numero de navios colocados
+let modePlacement = "horizontal"; // controla o modo de inserção de navios horizontal/vertical
+var lineBreakStatus = false; // status da quebra de linha, impede execucoes indevidas
+var lineBreakStatusLight = false // status da quebra de linha do efeito de sobreposição
+const endLinesH = [56,57,58,59,60,61,62,63]; // array de linhas horizontais
+const endLines = [7,15,23,31,39,47,55,63]; // array de linhas verticais
 
 ////////////////////////
 // DRAW THE TABLES AND CELLS
@@ -21,8 +25,8 @@ drawGame();
 /////////////////////////////
 function changeMode(){
     modePlacement == "horizontal" ? modePlacement = "vertical" : modePlacement = "horizontal";
+    document.getElementById("pos").textContent = modePlacement;
 }
-
 
 ////////////////////////
 // INICIA O JOGO
@@ -43,23 +47,47 @@ function totalPlacementShips(){
     return totalShips;
 }
 
+
  /////////////////////////////
  // controla o placement dos navios na quebra de linha
- var lineBreakStatus = false;
- function lineBreakCheck(id, numPlace){
-    const endLines = [7,15,23,31,39,47,55,63];
-    var ocupiedSpace = (id + numPlace) - 1;
-    for (let index = 0; index < 8; index++) {
-        lineBreak = endLines[index];
-        if(id <= lineBreak){    
-            if(ocupiedSpace > lineBreak){
-                mensagem("linha ultrapassada");
-                lineBreakStatus = true;
+ function lineBreakCheck(id, numPlace, origin){
+    if(modePlacement == "horizontal"){
+        var ocupiedSpace = (id + numPlace) - 1;
+        for (let index = 0; index < 8; index++) {
+            lineBreak = endLines[index];
+            if(id <= lineBreak){    
+                if(ocupiedSpace > lineBreak){
+                    console.log(origin)
+                    ocupiedResult(origin);
+                }
+            }
+        }
+    } else {
+        var ocupiedSpaceH = (id + numPlace + 8) - 1;
+        for (let index = 0; index < 8; index++) {
+            lineBreakH = endLinesH[index];
+            if(id <= lineBreakH){    
+                if(ocupiedSpaceH > lineBreakH){
+                    console.log(origin)
+                    ocupiedResult(origin);
+                }
             }
         }
     }
-    occupiedPlace(id, numPlace);
+    if(origin == "click"){
+        occupiedPlace(id, numPlace);
+    }
 }
+
+function ocupiedResult(origin){
+    //mensagem("linha ultrapassada");
+    if(origin == "click"){
+        lineBreakStatus = true;
+    } else if(origin == "mouse"){
+        lineBreakStatusLight = true;
+    }
+}
+
 
 /////////////////////////////
  // controla o placement de lugares ocupados
@@ -68,11 +96,21 @@ function totalPlacementShips(){
     // valida se o lugar esta vazio na horizontal
     let provId = id;
     var empty = true
-    for (let index = 0; index < numPlace; index++) {
-        if(playerShips.has(provId)){
-            var empty = false;
+    if(modePlacement == "horizontal"){
+        for (let index = 0; index < numPlace; index++) {
+            if(playerShips.has(provId)){
+                var empty = false;
+            }
+            provId++
         }
-        provId++
+    } else {
+        var provIdH = provId;
+        for (let index = 0; index < numPlace; index++) {
+            if(playerShips.has(provIdH)){
+                var empty = false;
+            }
+            provIdH = provIdH + 8;
+        }
     }
     if(!empty){
         occupiedPlaceStatus = true;
@@ -84,8 +122,8 @@ function totalPlacementShips(){
 // controla o placment dos navios do player
 function place(id){
     if( gameStep == 0){
-        lineBreakCheck(id, num);
-        
+        lineBreakCheck(id, num, "click");
+       
         // verifica linha e lugar
         if( !lineBreakStatus && !occupiedPlaceStatus){
             if(placebeShips > 7){
@@ -96,8 +134,7 @@ function place(id){
                 
                 document.getElementById("ships").textContent = ships;
             } else if(placebeShips > 1){
-                sub--;
-                
+                sub--;            
                 document.getElementById("submarines").textContent = sub;
             } else {
                 carrier--;                
@@ -110,26 +147,34 @@ function place(id){
         }
         lineBreakStatus = false;
         occupiedPlaceStatus = false;
-    } else{
-        
-    }
+    } 
 }
 
+//////////////////////////////////////////////////
+// adiciona os lugares pela Inteligencia Artificial
 function putAiShips(){
+
 //    randomId = Math.floor(Math.random() * 10);
+
 }
-
-
-
 
 //////////////////////////////////////////////////
 // cotrola a adicao e posicao dos lugares
 function addAditionalPlace(id, numPlace){
     // adiciona o navio ao tabuleiro
-    for (let index = 0; index < numPlace; index++) {
-        document.getElementById(playerTime+id).classList.add("shipped")
-        playerShips.add(id);
-        id++
+    if(modePlacement == "horizontal"){
+        for (let index = 0; index < numPlace; index++) {
+            document.getElementById(playerTime+id).classList.add("shipped")
+            playerShips.add(id);
+            id++
+        }
+    } else {
+        var verticalMarkup = id
+        for (let index = 0; index < numPlace; index++) {
+            document.getElementById(playerTime+verticalMarkup).classList.add("shipped")
+            playerShips.add(id);
+            verticalMarkup = verticalMarkup + 8
+        }
     }
     // update the num size var
     if(placebeShips === 8 || placebeShips === 4 || placebeShips === 2 ){
@@ -145,7 +190,7 @@ function addAditionalPlace(id, numPlace){
 function checkExistence(id, num){
     for (let index = 0; index < num; index++) {
         id++        
-        document.getElementById("p"+id).classList.add("shipped");
+        document.getElementById(playerTime+id).classList.add("shipped");
         return
     }
 }
@@ -157,24 +202,37 @@ function mensagem(msg){
     pop.classList.add("visible")
     setTimeout(function(){
         pop.classList.remove("visible")
-    }, 3000)
+    }, 4000)
 }
 
 ////////////////////
 // lights ship place
 function lightning(lIndex){
     if(gameStep == 0 && placebeShips > 0){
-        const ele = document.getElementById("p"+lIndex)
+        const ele = document.getElementById(playerTime+lIndex);
         ele.classList.add("light");
-        
-        for (let bIndex = 0; bIndex < num; bIndex++) {
-            if(lIndex > 63){
-                lIndex = 63
-            }
-            document.getElementById("p"+lIndex).classList.add("light");
-            lIndex++;
+        lineBreakCheck(lIndex, num, "mouse")
+        if( !lineBreakStatusLight ){
+            if(modePlacement == "horizontal"){
+                for (let bIndex = 0; bIndex < num; bIndex++) {
+                    if(lIndex > 63){
+                        lIndex = 63
+                    }
+                    document.getElementById(playerTime+lIndex).classList.add("light");
+                    lIndex++;
+                }
+            } else {
+                var hCol = lIndex;
+                for (let bIndex = 0; bIndex < num; bIndex++) {
+                    if(hCol > 63){
+                        hCol = 63
+                    }
+                    document.getElementById(playerTime+hCol).classList.add("light");
+                    hCol = hCol + 8;
+                }
+            }   
         }
-        
+        lineBreakStatusLight = false;
     }
 }
 function lightoff(){
@@ -184,9 +242,6 @@ function lightoff(){
     }
     
 }
-    
-
-
     
 function bomb(id){
     
