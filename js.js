@@ -152,7 +152,7 @@ function place(id){
     actionMode = "click";
 
     if( gameStep == 0){
-        shipSpacesPreview(id, shipSize)
+        
 
         lineBreakCheck(id, shipSize, "click");
        
@@ -192,25 +192,6 @@ function putAiShips(){
 var preview_ocupiedSpaces_mouse = new Array([]);
 var preview_ocupiedSpaces = new Array([]);
 
-////////////////////////////////////////////
-/// Creates an array containing the cells a new ship will ocupy to compare these values with other intereactions
-function shipSpacesPreview(cellId, spaces){ // 30
-    for (let index = 0; index < spaces; index++) {
-        // calcula as adições ao array por modo de placement
-        if(mode == "horizontal"){
-            cellId++
-        } else{
-            let cellId = cellId + 8;
-        }
-        // adiciona ao array por action mode
-        if( actionMode == "click"){
-            preview_ocupiedSpaces.push(cellId);
-        } else {
-            preview_ocupiedSpaces_mouse.push(cellId);
-        }
-    }
-    
-}
 
 //////////////////////////////////////////////////
 // cotrola a adicao e posicao dos lugares
@@ -274,6 +255,11 @@ function cellToFill(initCell, size){ // 32, 2
     return cells;
 }
 
+// verifca se um array existe dentro de outro
+function checker(arr, target){
+    return target.every(v => arr.includes(v));
+}
+
 
 
 ////////////////////
@@ -282,14 +268,20 @@ function lightning(cellId_lg){
     actionMode = "mouse";
     cellToLight = cellToFill(cellId_lg, shipSize);
     light = false;
-
-    let checker = (arr, target) => target.every(v => arr.includes(v));
-
-    for (let index = 0; index < tableCells.length; index++) {
-        if(checker(tableCells[index], cellToLight)){
-            light = true;
-            break;
-        }    
+    if(mode == "horizontal"){
+        for (let index = 0; index < tableCells.length; index++) {
+            if(checker(tableCells[index], cellToLight)){
+                light = true;
+                break;
+            }    
+        }
+    } else {
+        for (let index = 0; index < tableColumns.length; index++) {
+            if(checker(tableColumns[index], cellToLight)){
+                light = true;
+                break;
+            }    
+        }
     }
     // ilumina as celulas
     if(light == true){
