@@ -113,7 +113,8 @@ function place(cellId){
             console.log("All Ships placed")
         }
         if(playerShipsPlace.total > 0){
-            let cellsToFill = cellToFill(id, shipSize)
+
+            
 
             for (let index = 0; index < cellsToFill.length; index++) {
                 document.getElementById(playerTime+cellsToFill[index]).classList.add("shipped")
@@ -127,7 +128,7 @@ function place(cellId){
             placebeShips--;
 
             totalShips = totalPlacementShips();
-        } */
+        } 
     } 
 }
 
