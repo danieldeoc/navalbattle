@@ -1,10 +1,11 @@
 const root = document.getElementById("root"); // root
 let gameStep = 0; // etapa do jogo
-var actionMode = null;
 var mode = "horizontal"; // controla o modo de inserção de navios horizontal/vertical
+let playerTime = "p";   // controla a vez do jogador
+var shipSize = 1;
 
-const playerShips = new Set([]); // navios do Player
-const aiShip = new Set([]); // navios do AI
+const playerShips = []; // navios do Player
+const aiShip = []; // navios do AI
 
 const tableCells = [
     [0,1,2,3,4,5,6,7],
@@ -27,17 +28,15 @@ const tableColumns = [
     [7,15,23,31,39,47,55,63]
 ]
 
+let playerShipsPlace = {
+    total: 15,
+    boats: 8,
+    ships: 4,
+    subs: 2,
+    carrier: 1
+}
 
 
-let playerTime = "p";   // controla a vez do jogador
-let shipPlacement = 0;  // posicao da disposicao
-let placebeShips = 15; // numero de navios colocaveis
-let placedShips = 0; // numero de navios colocados
-var lineBreakStatus = false; // status da quebra de linha, impede execucoes indevidas
-var lineBreakStatusLight = false // status da quebra de linha do efeito de sobreposição
-
-const endLinesH = [56,57,58,59,60,61,62,63]; // array de linhas horizontais
-const endLines = [7,15,23,31,39,47,55,63]; // array de linhas verticais
 
 ////////////////////////
 // DRAW THE TABLES AND CELLS
@@ -61,124 +60,74 @@ document.getElementById("start").addEventListener('click', () => {
     document.getElementById("gamePanel").innerHTML = "<div id='fase'>Place your ships!</div>";
 } )
 
-////////////////////////////////////////////////
-// controla a quantidade de placementes de navios e espaço ocupado
-let shipSize = 1;
-var totalShips = 15
-var boats = 8;
-var ships = 4;
-var sub = 2;
-var carrier = 1;
-function totalPlacementShips(){
-    var totalShips = boats + ships + sub + carrier;
-    return totalShips;
+
+/// define o numer de celulas a clarear ou preencher
+function cellToFill(initCell, size){ // 32, 2
+    cells = [];
+    for (let index = 0; index < size; index++) { // 32, 33
+        if(mode == "horizontal"){
+            cells.push(initCell)
+            initCell++
+        } else {    // 32, 40
+            cells.push(initCell)
+            initCell = initCell + 8;
+        }
+    }
+    return cells;
 }
 
-
- /////////////////////////////
- // controla o placement dos navios na quebra de linha
- function lineBreakCheck(id, numPlace, actionMode){
-    if(mode == "horizontal"){
-        var ocupiedSpace = (id + numPlace) - 1;
-        for (let index = 0; index < 8; index++) {
-            lineBreak = endLines[index];
-            if(id <= lineBreak){    
-                if(ocupiedSpace > lineBreak){
-                    
-                    ocupiedResult(actionMode);
-                }
-            }
-        }
-    } else {
-        var ocupiedSpaceH = (id + numPlace) - 1;
-        for (let index = 0; index < 8; index++) {
-            lineBreakH = endLinesH[index];
-            if(id <= lineBreakH){    
-                
-                if(ocupiedSpaceH > lineBreakH){
-                    
-                    ocupiedResult(actionMode);
-                }
-            }
-        }
-    }
-    if(actionMode == "click"){
-        occupiedPlace(id, numPlace);
-    }
+// verifca se um array existe dentro de outro
+function checker(arr, target){
+    return target.every(v => arr.includes(v));
 }
-
-function ocupiedResult(actionMode){
-    //mensagem("linha ultrapassada");
-    if(actionMode == "click"){
-        lineBreakStatus = true;
-    } else if(actionMode == "mouse"){
-        lineBreakStatusLight = true;
-    }
-}
-
-
-/////////////////////////////
- // controla o placement de lugares ocupados
- var occupiedPlaceStatus = false;
- function occupiedPlace(id, numPlace){
-    // valida se o lugar esta vazio na horizontal
-    let provId = id;
-    var empty = true
-    if(mode == "horizontal"){
-        for (let index = 0; index < numPlace; index++) {
-            if(playerShips.has(provId)){
-                var empty = false;
-            }
-            provId++
-        }
-    } else {
-        var provIdH = provId;
-        for (let index = 0; index < numPlace; index++) {
-            if(playerShips.has(provIdH)){
-                var empty = false;
-            }
-            provIdH = provIdH + 8;
-        }
-    }
-    if(!empty){
-        occupiedPlaceStatus = true;
-        mensagem("lugar ocupado");
-    }
- }
 
 /////////////////////
 // controla o placment dos navios do player
-function place(id){
-    actionMode = "click";
+function place(cellId){
+    
+    if(gameStep == 0){
 
-    if( gameStep == 0){
-        
-
-        lineBreakCheck(id, shipSize, "click");
-       
-        // verifica linha e lugar
-        if( !lineBreakStatus && !occupiedPlaceStatus){
-            if(placebeShips > 7){
-                boats--;
-                document.getElementById("boats").textContent = boats;
-            } else if(placebeShips > 3){
-                ships--;
-                
-                document.getElementById("ships").textContent = ships;
-            } else if(placebeShips > 1){
-                sub--;            
-                document.getElementById("submarines").textContent = sub;
-            } else {
-                carrier--;                
-                document.getElementById("carriers").textContent = carrier;
-            }
-            if(totalShips >= 1){
-                addAditionalPlace(id, shipSize);
-                totalShips = totalPlacementShips();
-            }
+        placeToShip = cellToFill(cellId, shipSize);
+        if(checker(placeToShip,playerShips)){
+            console.log("true")
         }
-        lineBreakStatus = false;
-        occupiedPlaceStatus = false;
+
+
+
+        if(playerShipsPlace.boats > 0){
+            playerShipsPlace.boats = playerShipsPlace.boats - 1;
+            document.getElementById("boats").textContent = playerShipsPlace.boats;
+        } else if(playerShipsPlace.ships > 0){
+            playerShipsPlace.ships = playerShipsPlace.ships - 1;
+            shipSize = 2;
+            document.getElementById("ships").textContent = playerShipsPlace.ships;
+        } else if(playerShipsPlace.subs > 0){
+            playerShipsPlace.subs =  playerShipsPlace.subs - 1;   
+            shipSize = 3;     
+            document.getElementById("submarines").textContent = playerShipsPlace.subs;
+        } else if(playerShipsPlace.carrier > 0){
+            playerShipsPlace.carrier = playerShipsPlace.carrier - 1;
+            shipSize = 4;             
+            document.getElementById("carriers").textContent = playerShipsPlace.carrier;
+        } else {
+            console.log("All Ships placed")
+        }
+        if(playerShipsPlace.total > 0){
+            let cellsToFill = cellToFill(id, shipSize)
+
+            for (let index = 0; index < cellsToFill.length; index++) {
+                document.getElementById(playerTime+cellsToFill[index]).classList.add("shipped")
+            }
+            // update the num size var
+            if(placebeShips === 8 || placebeShips === 4 || placebeShips === 2 ){
+                shipSize++
+            } else if(placebeShips === 1){
+                gameStep = 1
+            }
+            placebeShips--;
+
+            totalShips = totalPlacementShips();
+        } */
     } 
 }
 
@@ -193,32 +142,6 @@ var preview_ocupiedSpaces_mouse = new Array([]);
 var preview_ocupiedSpaces = new Array([]);
 
 
-//////////////////////////////////////////////////
-// cotrola a adicao e posicao dos lugares
-function addAditionalPlace(id, numPlace){
-    // adiciona o navio ao tabuleiro
-    if(mode == "horizontal"){
-        for (let index = 0; index < numPlace; index++) {
-            document.getElementById(playerTime+id).classList.add("shipped")
-            playerShips.add(id);
-            id++
-        }
-    } else {
-        var verticalMarkup = id
-        for (let index = 0; index < numPlace; index++) {
-            document.getElementById(playerTime+verticalMarkup).classList.add("shipped")
-            playerShips.add(id);
-            verticalMarkup = verticalMarkup + 8
-        }
-    }
-    // update the num size var
-    if(placebeShips === 8 || placebeShips === 4 || placebeShips === 2 ){
-        shipSize++
-    } else if(placebeShips === 1){
-        gameStep = 1
-    }
-    placebeShips--;
-}
 
 ///////////////////
 // marca a posicao como Ocupada
@@ -240,32 +163,11 @@ function mensagem(msg){
     }, 4000)
 }
 
-/// define o numer de celulas a clarear
-function cellToFill(initCell, size){ // 32, 2
-    cells = [];
-    for (let index = 0; index < size; index++) { // 32, 33
-        if(mode == "horizontal"){
-            cells.push(initCell)
-            initCell++
-        } else {    // 32, 40
-            cells.push(initCell)
-            initCell = initCell + 8;
-        }
-    }
-    return cells;
-}
-
-// verifca se um array existe dentro de outro
-function checker(arr, target){
-    return target.every(v => arr.includes(v));
-}
-
 
 
 ////////////////////
 // lights ship place
 function lightning(cellId_lg){
-    actionMode = "mouse";
     cellToLight = cellToFill(cellId_lg, shipSize);
     light = false;
     if(mode == "horizontal"){
@@ -291,6 +193,7 @@ function lightning(cellId_lg){
     }
     light = false;
 }
+
 ///////////////////////////
 /// Desliga as luzes
 function lightoff(){
