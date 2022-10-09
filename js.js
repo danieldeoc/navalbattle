@@ -2,8 +2,7 @@ const root = document.getElementById("root"); // root
 let gameStep = 0; // etapa do jogo
 var mode = "horizontal"; // controla o modo de inserção de navios horizontal/vertical
 let playerTime = "p";   // controla a vez do jogador
-var shipSize = 1;
-
+var shipSize = 1; // start the size of the ship 
 const playerShips = []; // navios do Player
 const aiShip = []; // navios do AI
 
@@ -35,6 +34,13 @@ let playerShipsPlace = {
     subs: 2,
     carrier: 1
 }
+let aiShipsPlace = {
+    total: 15,
+    boats: 8,
+    ships: 4,
+    subs: 2,
+    carrier: 1
+}
 
 
 
@@ -42,24 +48,18 @@ let playerShipsPlace = {
 // DRAW THE TABLES AND CELLS
 function drawGame(){
     for (let index = 0; index < 64; index++) {
-        document.getElementById("ai").innerHTML += "<div class='cell' id='ai"+index+"' onClick='bomb("+index+")'></div>";
+        document.getElementById("ai").innerHTML += "<div class='cell' id='ai"+index+"' onClick='bomb("+index+")'>"+index+"</div>";
         document.getElementById("player").innerHTML += "<div class='cell' id='p"+index+"' onClick='place("+index+")' onmouseenter='lightning("+index+")' onmouseleave='lightoff()'>"+index+"</div>";
     }
 }
 drawGame();
 
 /////////////////////////////
+/// changes horizontal and vertical placement mode
 function changeMode(){
     mode == "horizontal" ? mode = "vertical" : mode = "horizontal";
     document.getElementById("pos").textContent = mode;
 }
-
-////////////////////////
-// INICIA O JOGO
-document.getElementById("start").addEventListener('click', () => { 
-    document.getElementById("gamePanel").innerHTML = "<div id='fase'>Place your ships!</div>";
-} )
-
 
 /// define o numer de celulas a clarear ou preencher
 function cellToFill(initCell, size){ // 32, 2
@@ -81,68 +81,60 @@ function checker(arr, target){
     return target.every(v => arr.includes(v));
 }
 
+////////////////////////////
+/// Ship size
+function sizeShip(){
+    if(playerShipsPlace.boats > 0){
+        shipSize = 1;
+    } else if(playerShipsPlace.ships > 0){
+        shipSize = 2;
+    } else if(playerShipsPlace.subs > 0){
+        shipSize = 3;
+    } else if(playerShipsPlace.carrier > 0){
+        shipSize = 4;
+    } else {
+        shipSize = 0;
+    }
+}
+
 /////////////////////
 // controla o placment dos navios do player
 function place(cellId){
-    
     if(gameStep == 0){
-
         placeToShip = cellToFill(cellId, shipSize);
-        if(checker(placeToShip,playerShips)){
-            console.log("true")
-        }
-
-
-
+        sizeShip(); // controls the shipzie
+        // controls the ship place info board 
         if(playerShipsPlace.boats > 0){
             playerShipsPlace.boats = playerShipsPlace.boats - 1;
             document.getElementById("boats").textContent = playerShipsPlace.boats;
         } else if(playerShipsPlace.ships > 0){
             playerShipsPlace.ships = playerShipsPlace.ships - 1;
-            shipSize = 2;
             document.getElementById("ships").textContent = playerShipsPlace.ships;
         } else if(playerShipsPlace.subs > 0){
             playerShipsPlace.subs =  playerShipsPlace.subs - 1;   
-            shipSize = 3;     
             document.getElementById("submarines").textContent = playerShipsPlace.subs;
         } else if(playerShipsPlace.carrier > 0){
-            playerShipsPlace.carrier = playerShipsPlace.carrier - 1;
-            shipSize = 4;             
+            playerShipsPlace.carrier = playerShipsPlace.carrier - 1;         
             document.getElementById("carriers").textContent = playerShipsPlace.carrier;
         } else {
-            console.log("All Ships placed")
+            mensagem("All Ships placed")
         }
         if(playerShipsPlace.total > 0){
-
-            
-
-            for (let index = 0; index < cellsToFill.length; index++) {
-                document.getElementById(playerTime+cellsToFill[index]).classList.add("shipped")
-            }
-            // update the num size var
-            if(placebeShips === 8 || placebeShips === 4 || placebeShips === 2 ){
-                shipSize++
-            } else if(placebeShips === 1){
-                gameStep = 1
-            }
-            placebeShips--;
-
-            totalShips = totalPlacementShips();
-        } 
+            playerShipsPlace.total = playerShipsPlace.total - 1;
+            for (let index = 0; index < shipSize; index++) {
+                playerShips.push(cellId);
+                document.getElementById(playerTime+cellId).classList.add("shipped")
+                if(mode == "horizontal"){
+                    cellId++
+                } else {
+                    cellId = cellId + 8;
+                }
+            }       
+        } else {
+            putAiShips();
+        }
     } 
 }
-
-//////////////////////////////////////////////////
-// adiciona os lugares pela Inteligencia Artificial
-function putAiShips(){
-
-//    randomId = Math.floor(Math.random() * 10);
-
-}
-var preview_ocupiedSpaces_mouse = new Array([]);
-var preview_ocupiedSpaces = new Array([]);
-
-
 
 ///////////////////
 // marca a posicao como Ocupada
@@ -164,11 +156,10 @@ function mensagem(msg){
     }, 4000)
 }
 
-
-
 ////////////////////
 // lights ship place
 function lightning(cellId_lg){
+    sizeShip();
     cellToLight = cellToFill(cellId_lg, shipSize);
     light = false;
     if(mode == "horizontal"){
@@ -203,6 +194,44 @@ function lightoff(){
         lights[index].classList.remove("light")
     }
 }
+
+
+//////////////////////////////////////////////////
+// adiciona os lugares pela Inteligencia Artificial
+
+//aiShipsPlace
+function putAiShips(){
+    playerTime = "ai";
+    shipSize = 1;
+
+    // put the 15 ships
+    for (let index = 0; index < aiShipsPlace.total; index++) {
+        
+        var tempPlace = []; // temp comparison array
+        for (let index = 0; index < shipSize; index++) {
+            const cellToPut = Math.floor(Math.random() * (63 - 0)) + 0 + 1;
+            tempPlace.push(cellToPut)
+        }
+
+
+
+        aiShipsPlace.total = aiShipsPlace.total - 1;
+    }
+
+
+    // control ai ship size placement
+    if(aiShipsPlace.boats > 0){
+
+    }
+
+    console.log(cellToPut)
+
+
+}
+
+
+
+
     
 function bomb(id){
     
