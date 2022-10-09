@@ -42,8 +42,6 @@ let aiShipsPlace = {
     carrier: 1
 }
 
-
-
 ////////////////////////
 // DRAW THE TABLES AND CELLS
 function drawGame(){
@@ -77,9 +75,19 @@ function cellToFill(initCell, size){ // 32, 2
 }
 
 // verifca se um array existe dentro de outro
-function checker(arr, target){
+function checkerSome(arr, target){
+    return arr.some(r=> target.includes(r))
+    /*
+    some(..) checks each element of the array against a test function 
+    and returns true if any element of the array passes the test function, 
+    otherwise, it returns false.
+    */
+}
+
+function checkerEvery(arr, target){
     return target.every(v => arr.includes(v));
 }
+
 
 ////////////////////////////
 /// Ship size
@@ -102,50 +110,51 @@ function sizeShip(){
 function place(cellId){
     if(gameStep == 0){
         placeToShip = cellToFill(cellId, shipSize);
-        sizeShip(); // controls the shipzie
-        // controls the ship place info board 
-        if(playerShipsPlace.boats > 0){
-            playerShipsPlace.boats = playerShipsPlace.boats - 1;
-            document.getElementById("boats").textContent = playerShipsPlace.boats;
-        } else if(playerShipsPlace.ships > 0){
-            playerShipsPlace.ships = playerShipsPlace.ships - 1;
-            document.getElementById("ships").textContent = playerShipsPlace.ships;
-        } else if(playerShipsPlace.subs > 0){
-            playerShipsPlace.subs =  playerShipsPlace.subs - 1;   
-            document.getElementById("submarines").textContent = playerShipsPlace.subs;
-        } else if(playerShipsPlace.carrier > 0){
-            playerShipsPlace.carrier = playerShipsPlace.carrier - 1;         
-            document.getElementById("carriers").textContent = playerShipsPlace.carrier;
-        } else {
-            mensagem("All Ships placed")
-        }
-        if(playerShipsPlace.total > 0){
-            playerShipsPlace.total = playerShipsPlace.total - 1;
-            for (let index = 0; index < shipSize; index++) {
-                playerShips.push(cellId);
-                document.getElementById(playerTime+cellId).classList.add("shipped")
-                if(mode == "horizontal"){
-                    cellId++
+        if(inTable(placeToShip)){// esta dentro da tabela?
+            if( !checkerSome(placeToShip, playerShips) ) { // lugar esta ocupado
+                sizeShip(); // controls the shipzie
+                // controls the ship place info board 
+                if(playerShipsPlace.boats > 0){
+                    playerShipsPlace.boats = playerShipsPlace.boats - 1;
+                    document.getElementById("boats").textContent = playerShipsPlace.boats;
+                } else if(playerShipsPlace.ships > 0){
+                    playerShipsPlace.ships = playerShipsPlace.ships - 1;
+                    document.getElementById("ships").textContent = playerShipsPlace.ships;
+                } else if(playerShipsPlace.subs > 0){
+                    playerShipsPlace.subs =  playerShipsPlace.subs - 1;   
+                    document.getElementById("submarines").textContent = playerShipsPlace.subs;
+                } else if(playerShipsPlace.carrier > 0){
+                    playerShipsPlace.carrier = playerShipsPlace.carrier - 1;         
+                    document.getElementById("carriers").textContent = playerShipsPlace.carrier;
                 } else {
-                    cellId = cellId + 8;
+                    mensagem("All Ships placed")
                 }
-            }       
+                if(playerShipsPlace.total > 0){
+                    playerShipsPlace.total = playerShipsPlace.total - 1;
+                    for (let index = 0; index < shipSize; index++) {
+                        playerShips.push(cellId);
+                        document.getElementById(playerTime+cellId).classList.add("shipped")
+                        if(mode == "horizontal"){
+                            cellId++
+                        } else {
+                            cellId = cellId + 8;
+                        }
+                    }    
+                } else {
+                    putAiShips();
+                }
+            
+            } else {
+                mensagem("Lugar ocupado")
+            }            
         } else {
-            putAiShips();
+            mensagem("Deves colocar o navio em apenas uma linha ou coluna")
         }
+        // esta ocupado?
     } 
 }
 
-///////////////////
-// marca a posicao como Ocupada
-function checkExistence(id, num){
-    for (let index = 0; index < num; index++) {
-        id++        
-        document.getElementById(playerTime+id).classList.add("shipped");
-        return
-    }
-}
-
+///////////////////////////
 // funcao que exibe a mensagem de erro para o jogador
 function mensagem(msg){
     const pop = document.getElementById("msgPop");
@@ -164,14 +173,14 @@ function lightning(cellId_lg){
     light = false;
     if(mode == "horizontal"){
         for (let index = 0; index < tableCells.length; index++) {
-            if(checker(tableCells[index], cellToLight)){
+            if(checkerEvery(tableCells[index], cellToLight)){
                 light = true;
                 break;
             }    
         }
     } else {
         for (let index = 0; index < tableColumns.length; index++) {
-            if(checker(tableColumns[index], cellToLight)){
+            if(checkerEvery(tableColumns[index], cellToLight)){
                 light = true;
                 break;
             }    
@@ -198,46 +207,75 @@ function lightoff(){
 
 //////////////////////////////////////////////////
 // adiciona os lugares pela Inteligencia Artificial
-
+function inTable(cells){
+    if(mode == "horizontal"){
+        for (let index = 0; index < tableCells.length; index++) {
+            if(checkerEvery(tableCells[index], cells)){
+                return true;
+            }    
+        }
+    } else {
+        for (let index = 0; index < tableColumns.length; index++) {
+            if(checkerEvery(tableColumns[index], cells)){
+                return true;
+            }    
+        }
+    }
+}
+///////////////////////////
 //aiShipsPlace
 function putAiShips(){
     playerTime = "ai";
-    shipSize = 1;
-
+    var tempAiShipSpaces = [];
+    var openPositon = true;
     // put the 15 ships
-    for (let index = 0; index < aiShipsPlace.total; index++) {
-        
-        var tempPlace = []; // temp comparison array
-        for (let index = 0; index < shipSize; index++) {
-            const cellToPut = Math.floor(Math.random() * (63 - 0)) + 0 + 1;
-            tempPlace.push(cellToPut)
+    for (let index = 0; index < 15; index++) {
+        if(aiShipsPlace.boats > 0){
+            aiShipsPlace.boats = aiShipsPlace.boats - 1;
+            shipSize = 1;
+        } else if(aiShipsPlace.ships > 0){
+            shipSize = 2;
+            aiShipsPlace.ships = aiShipsPlace.ships - 1;
+        } else if(aiShipsPlace.subs > 0){
+            shipSize = 3;
+            aiShipsPlace.subs = aiShipsPlace.subs - 1;
+        } else if(aiShipsPlace.carrier > 0){
+            shipSize = 4;
+            aiShipsPlace.carrier = aiShipsPlace.carrier - 1;
         }
-
-
-
-        aiShipsPlace.total = aiShipsPlace.total - 1;
-    }
-
-
-    // control ai ship size placement
-    if(aiShipsPlace.boats > 0){
-
-    }
-
-    console.log(cellToPut)
-
-
+        //////////
+        while(openPositon){
+            cellToPut = Math.floor(Math.random() * (62 - 0)) + 0 + 1; // gera posição randomica > 28
+            for (let index = 0; index < shipSize; index++) {
+                tempAiShipSpaces.push(cellToPut)
+                cellToPut++                
+            } // cria o range temporário do navio > 34 + 2 > [28,29]]
+            var aiInTableLines = inTable(tempAiShipSpaces)
+            if(aiInTableLines){
+                if(!checkerSome(tempAiShipSpaces,aiShip)){  
+                    for (let index = 0; index < tempAiShipSpaces.length; index++) {
+                        aiShip.push(tempAiShipSpaces[index])
+                        document.getElementById(playerTime+tempAiShipSpaces[index]).classList.add("shipped")
+                    }
+                    var openPositon = false;
+                }
+            } 
+            tempAiShipSpaces.length = 0
+        }
+        var openPositon = true;
+    }    
 }
 
-
-
-
-    
+///////////////////////////
 function bomb(id){
     
 }
 
-    
-    
-    
-  
+
+function checkerTest(){
+    var var1 = [12,14,15,18,19,44,45,5,59];
+    var var2 = [44,45,90];
+
+    console.log(checkerSome(var1,var2)) // o array1 contem o array2? true or false
+}
+
