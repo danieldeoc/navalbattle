@@ -33,14 +33,14 @@ const tableColumns = [
     [7,15,23,31,39,47,55,63]
 ]
 
-let playerShipsPlace = {
+var playerShipsPlace = {
     total: 15,
     boats: 8,
     ships: 4,
     subs: 2,
     carrier: 1
 }
-let aiShipsPlace = {
+var aiShipsPlace = {
     total: 15,
     boats: 8,
     ships: 4,
@@ -321,10 +321,9 @@ function bomb(id){
     }
 }
 
-const aiPlays = []
+
 // ai bombs
 function aiBomb(){
-    console.log(gameStep)
     if(gameStep == 1){
         playerTime = "p";
         bombPlace = true;
@@ -336,7 +335,6 @@ function aiBomb(){
                 var bombPlayerCell = 0;
             }
             const bombPlayerCellValue = aiAvaliableBombs[bombPlayerCell];
-            aiPlays.push(bombPlayerCellValue)
             if(aiAvaliableBombs.indexOf( bombPlayerCellValue ) > -1 ){
                 aiAvaliableBombs.splice(bombPlayerCell, 1) // remove do array
                 bombCell(playerTime, bombPlayerCellValue); // bombardeia usuario visualmente
@@ -367,5 +365,41 @@ function compareWinner(){
         console.log("Ai venceu")
         gameStep = 2;
     } 
+}
+
+function playAgain(){
+    gameStep = 0;
+    playerTime = "p";
+    playerShips.length = 0;
+    aiShips.length = 0;
+    aiAvaliableBombs.length = 0;
+    playerAvaliableBombs.length = 0;
+    for (let index = 0; index < 64; index++) {
+        aiAvaliableBombs.push(index);
+        playerAvaliableBombs.push(index);
+    }
+    playerRightBombs.length = 0;
+    aiRightBombs.length = 0;
+
+    var lights = document.querySelectorAll(".bombed, .shipped")
+    for (let index = 0; index < lights.length; index++) {
+        lights[index].classList.remove("bombed");
+        lights[index].classList.remove("shipped");
+    }
+    shipSize = 1;
+
+    playerShipsPlace.total = 15;
+    playerShipsPlace.boats = 8;
+    playerShipsPlace.ships = 4;
+    playerShipsPlace.subs = 2;
+    playerShipsPlace.carrier = 1;
+
+    aiShipsPlace.total = 15;
+    aiShipsPlace.boats = 8;
+    aiShipsPlace.ships = 4;
+    aiShipsPlace.subs = 2;
+    aiShipsPlace.carrier = 1;
+
+    
 }
 
