@@ -294,15 +294,28 @@ function putAiShips(){
 ///////////////////////////
 ///////////////////////////
 /// Game Functions
-const playerBombs = [];
-const aiBombs = [];
+const aiAvaliableBombs = [];
+const playerAvaliableBombs = []; // celulas disponiveis para ataque
+for (let index = 0; index < 64; index++) {
+    aiAvaliableBombs.push(index);
+    playerAvaliableBombs.push(index);
+}
+const playerRightBombs = [];
+const aiRightBombs = []; // ataques bem sucedidos
+
 // player bomb
 function bomb(id){
     playerTime = "ai";
-    if( playerBombs.indexOf(id) == -1 ){
-        playerBombs.push(id)
-        bombCell(playerTime, id);
-        aiBomb();
+    playerCellIndex = playerAvaliableBombs.indexOf(id);
+    console.log(playerCellIndex.find(ele => ele == id))
+    if( playerCellIndex > -1 ){
+        //playerAvaliableBombs.delete(id)
+        /*  bombCell(playerTime, id);
+        if(playerShips.indexOf(id) > -1){
+            playerRightBombs.add(index);
+            compareWinner();
+        }
+        aiBomb(); */
     } else {
         mensagem("Lugar já bombardeado")
     }
@@ -314,10 +327,13 @@ function aiBomb(){
     bombPlace = true;
     while(bombPlace){
         const bombPlayerCell = randomCell();
-        if( aiBombs.indexOf(bombPlayerCell) == -1 ){
-            aiBombs.push(bombPlayerCell)
+        if( aiAvaliableBombs.has(bombPlayerCell) ){
+            aiAvaliableBombs.delete(bombPlayerCell)
+            aiAvaliableBombs.add(bombPlayerCell)
             bombCell(playerTime, bombPlayerCell);
             bombPlace = false;
+        } else{
+            console.log("lugar já bombardeado")
         }
     }
 
@@ -326,5 +342,13 @@ function aiBomb(){
 
 function bombCell(playerTime, id){
     document.getElementById(playerTime+id).classList.add("bombed")
+}
+
+////////////
+/// define o vencedor
+function compareWinner(){
+
+    // define o vencedor
+
 }
 
