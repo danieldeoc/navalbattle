@@ -10,7 +10,7 @@ var mode = "horizontal"; // controla o modo de inserção de navios horizontal/v
 let playerTime = "p";   // controla a vez do jogador
 var shipSize = 1; // start the size of the ship 
 const playerShips = []; // navios do Player
-const aiShip = []; // navios do AI
+const aiShips = []; // navios do AI
 
 const tableCells = [
     [0,1,2,3,4,5,6,7],
@@ -156,7 +156,6 @@ function place(cellId){
         } else {
             mensagem("Deves colocar o navio em apenas uma linha ou coluna")
         }
-        // esta ocupado?
     } 
 }
 
@@ -276,9 +275,9 @@ function putAiShips(){
 
             var aiInTableLines = inTable(tempAiShipSpaces)
             if(aiInTableLines){
-                if(!checkerSome(tempAiShipSpaces,aiShip)){  
+                if(!checkerSome(tempAiShipSpaces,aiShips)){  
                     for (let index = 0; index < tempAiShipSpaces.length; index++) {
-                        aiShip.push(tempAiShipSpaces[index])
+                        aiShips.push(tempAiShipSpaces[index])
                         document.getElementById(playerTime+tempAiShipSpaces[index]).classList.add("shipped")
                     }
                     var openPositon = false;
@@ -305,39 +304,50 @@ const aiRightBombs = []; // ataques bem sucedidos
 
 // player bomb
 function bomb(id){
-    playerTime = "ai";
-    playerCellIndex = playerAvaliableBombs.indexOf(id);
-    console.log(playerCellIndex.find(ele => ele == id))
-    if( playerCellIndex > -1 ){
-        //playerAvaliableBombs.delete(id)
-        /*  bombCell(playerTime, id);
-        if(playerShips.indexOf(id) > -1){
-            playerRightBombs.add(index);
-            compareWinner();
+    if(gameStep == 1){
+        playerTime = "ai";
+        playerCellIndex = playerAvaliableBombs.indexOf(id);
+        if( playerCellIndex > -1 ){
+            playerAvaliableBombs.splice(playerCellIndex, 1)
+            bombCell(playerTime, id);
+            if(aiShips.indexOf(id) > -1){
+                playerRightBombs.push(id);
+                compareWinner();
+            }
+            aiBomb();
+        } else {
+            mensagem("Lugar já bombardeado")
         }
-        aiBomb(); */
-    } else {
-        mensagem("Lugar já bombardeado")
     }
-
 }
+
+const aiPlays = []
 // ai bombs
 function aiBomb(){
-    playerTime = "p";
-    bombPlace = true;
-    while(bombPlace){
-        const bombPlayerCell = randomCell();
-        if( aiAvaliableBombs.has(bombPlayerCell) ){
-            aiAvaliableBombs.delete(bombPlayerCell)
-            aiAvaliableBombs.add(bombPlayerCell)
-            bombCell(playerTime, bombPlayerCell);
-            bombPlace = false;
-        } else{
-            console.log("lugar já bombardeado")
+    console.log(gameStep)
+    if(gameStep == 1){
+        playerTime = "p";
+        bombPlace = true;
+        while(bombPlace){
+            var index = aiAvaliableBombs.length; // tamanho do array para definir o maximo
+            if(index > 1){
+                var bombPlayerCell = Math.floor(Math.random() * (index - 0)) + 0 + 1; // gera numero random no array
+            } else {
+                var bombPlayerCell = 0;
+            }
+            const bombPlayerCellValue = aiAvaliableBombs[bombPlayerCell];
+            aiPlays.push(bombPlayerCellValue)
+            if(aiAvaliableBombs.indexOf( bombPlayerCellValue ) > -1 ){
+                aiAvaliableBombs.splice(bombPlayerCell, 1) // remove do array
+                bombCell(playerTime, bombPlayerCellValue); // bombardeia usuario visualmente
+                if(playerShips.indexOf(bombPlayerCellValue) > -1){ // verifica se acertou
+                    aiRightBombs.push(bombPlayerCellValue);
+                    compareWinner();
+                }
+                bombPlace = false;
+            }
         }
     }
-
-    console.log("ai bomb "+ aiBombs + " player bomb: "+ playerBombs)
 }
 
 function bombCell(playerTime, id){
@@ -347,8 +357,15 @@ function bombCell(playerTime, id){
 ////////////
 /// define o vencedor
 function compareWinner(){
-
-    // define o vencedor
-
+    // is player winner?
+    if(checkerEvery(playerRightBombs, aiShips)){
+        mensagem("Jogador venceu")
+        console.log("Jogador venceu")
+        gameStep = 2;
+    } else if(checkerEvery(aiRightBombs, playerShips)){
+        mensagem("AI venceu")
+        console.log("Ai venceu")
+        gameStep = 2;
+    } 
 }
 
