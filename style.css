@@ -12,7 +12,11 @@
     -webkit-box-shadow: 0 0 4px 4px rgba(13, 167, 64, 0.2);
     box-shadow: 0 0 4px 4px rgba(13, 167, 64, 0.2);}
 
-.cell.light.cell.shipped{ background-color: red !important;}    
+.cell.light.cell.shipped{ background-color: red !important;} 
+
+.cell.bombed{ background-color: rgb(102, 9, 9); border-color: red;}
+
+.cell.shipped.bombed{ background-color: black;}
 
 .btnChangePos{ width: 40px; height: 40px; cursor: pointer; background-color: #333; color: white;}
 

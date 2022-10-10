@@ -1,5 +1,11 @@
 const root = document.getElementById("root"); // root
 let gameStep = 0; // etapa do jogo
+    /*
+        0 - ship placement
+        1 - bombardings
+        2 - results
+
+    */
 var mode = "horizontal"; // controla o modo de inserção de navios horizontal/vertical
 let playerTime = "p";   // controla a vez do jogador
 var shipSize = 1; // start the size of the ship 
@@ -224,10 +230,17 @@ function inTable(cells){
 }
 ///////////////////////////
 //aiShipsPlace
+function randomCell(){
+    const random = Math.floor(Math.random() * (62 - 0)) + 0 + 1; // gera posição randomica > 28
+    return random;
+}
+
+
 function putAiShips(){
     playerTime = "ai";
     var tempAiShipSpaces = [];
     var openPositon = true;
+    var positions = ["horizontal", "vertical"]
     // put the 15 ships
     for (let index = 0; index < 15; index++) {
         if(aiShipsPlace.boats > 0){
@@ -245,11 +258,22 @@ function putAiShips(){
         }
         //////////
         while(openPositon){
-            cellToPut = Math.floor(Math.random() * (62 - 0)) + 0 + 1; // gera posição randomica > 28
-            for (let index = 0; index < shipSize; index++) {
-                tempAiShipSpaces.push(cellToPut)
-                cellToPut++                
-            } // cria o range temporário do navio > 34 + 2 > [28,29]]
+            cellToPut = randomCell();
+            let aiMode = positions[Math.random().toFixed()];
+
+            if(aiMode == "horizontal"){
+                for (let index = 0; index < shipSize; index++) {
+                    tempAiShipSpaces.push(cellToPut)
+                    cellToPut++                
+                } // cria o range temporário do navio > 34 + 2 > [28,29]]
+            } else {
+                for (let index = 0; index < shipSize; index++) {
+                    tempAiShipSpaces.push(cellToPut)
+                    cellToPut = cellToPut + 8               
+                } // cria o range temporário do navio > 34 + 2 > [28,36]]
+            }
+
+
             var aiInTableLines = inTable(tempAiShipSpaces)
             if(aiInTableLines){
                 if(!checkerSome(tempAiShipSpaces,aiShip)){  
@@ -263,19 +287,44 @@ function putAiShips(){
             tempAiShipSpaces.length = 0
         }
         var openPositon = true;
+        gameStep = 1;
     }    
 }
 
 ///////////////////////////
+///////////////////////////
+/// Game Functions
+const playerBombs = [];
+const aiBombs = [];
+// player bomb
 function bomb(id){
-    
+    playerTime = "ai";
+    if( playerBombs.indexOf(id) == -1 ){
+        playerBombs.push(id)
+        bombCell(playerTime, id);
+        aiBomb();
+    } else {
+        mensagem("Lugar já bombardeado")
+    }
+
+}
+// ai bombs
+function aiBomb(){
+    playerTime = "p";
+    bombPlace = true;
+    while(bombPlace){
+        const bombPlayerCell = randomCell();
+        if( aiBombs.indexOf(bombPlayerCell) == -1 ){
+            aiBombs.push(bombPlayerCell)
+            bombCell(playerTime, bombPlayerCell);
+            bombPlace = false;
+        }
+    }
+
+    console.log("ai bomb "+ aiBombs + " player bomb: "+ playerBombs)
 }
 
-
-function checkerTest(){
-    var var1 = [12,14,15,18,19,44,45,5,59];
-    var var2 = [44,45,90];
-
-    console.log(checkerSome(var1,var2)) // o array1 contem o array2? true or false
+function bombCell(playerTime, id){
+    document.getElementById(playerTime+id).classList.add("bombed")
 }
 
