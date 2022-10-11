@@ -123,15 +123,19 @@ function place(cellId){
                 if(playerShipsPlace.boats > 0){
                     playerShipsPlace.boats = playerShipsPlace.boats - 1;
                     document.getElementById("boats").textContent = playerShipsPlace.boats;
+                    document.getElementById(playerTime+cellId).classList.add("boat");
                 } else if(playerShipsPlace.ships > 0){
                     playerShipsPlace.ships = playerShipsPlace.ships - 1;
                     document.getElementById("ships").textContent = playerShipsPlace.ships;
+                    document.getElementById(playerTime+cellId).classList.add("ship");
                 } else if(playerShipsPlace.subs > 0){
                     playerShipsPlace.subs =  playerShipsPlace.subs - 1;   
                     document.getElementById("submarines").textContent = playerShipsPlace.subs;
+                    document.getElementById(playerTime+cellId).classList.add("sub");
                 } else if(playerShipsPlace.carrier > 0){
                     playerShipsPlace.carrier = playerShipsPlace.carrier - 1;         
                     document.getElementById("carriers").textContent = playerShipsPlace.carrier;
+                    document.getElementById(playerTime+cellId).classList.add("carrier");
                 } else {
                     mensagem("All Ships placed")
                 }
