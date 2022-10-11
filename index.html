@@ -17,12 +17,17 @@
     <noscript>You need to enable JavaScript to run this app.</noscript>
     
     <div id="gamePlace">
+
+        <div class="gameCommands">
+          <div id="pos" class="btnChangePos" onclick="changeMode()">Horizontal</div>
+        </div>
+
         <div id="gamePanel"></div>
         
         <div id="boards">
             <div id="player"></div>
             <div id="ai"></div>
-            <div id="pos" class="btnChangePos" onclick="changeMode()">Horizontal</div>
+            
         </div>
         
         <div id="gameControls">
@@ -43,7 +48,7 @@
                   <span>Carriers to place:</span>
                   <span id="carriers">1</span>
                 </div>
-                <input id="num" type="hidden" />
+                
             </div>
             <button id="start">Start Game</button>
         </div>

@@ -52,8 +52,8 @@ var aiShipsPlace = {
 // DRAW THE TABLES AND CELLS
 function drawGame(){
     for (let index = 0; index < 64; index++) {
-        document.getElementById("ai").innerHTML += "<div class='cell' id='ai"+index+"' onClick='bomb("+index+")'>"+index+"</div>";
-        document.getElementById("player").innerHTML += "<div class='cell' id='p"+index+"' onClick='place("+index+")' onmouseenter='lightning("+index+")' onmouseleave='lightoff()'>"+index+"</div>";
+        document.getElementById("ai").innerHTML += "<div class='cell' id='ai"+index+"' onClick='bomb("+index+")'><span>"+index+"</span></div>";
+        document.getElementById("player").innerHTML += "<div class='cell' id='p"+index+"' onClick='place("+index+")' onmouseenter='lightning("+index+")' onmouseleave='lightoff()'><span>"+index+"</span></div>";
     }
 }
 drawGame();
