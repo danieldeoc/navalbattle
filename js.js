@@ -283,6 +283,16 @@ function putAiShips(){
                     for (let index = 0; index < tempAiShipSpaces.length; index++) {
                         aiShips.push(tempAiShipSpaces[index])
                         document.getElementById(playerTime+tempAiShipSpaces[index]).classList.add("shipped")
+
+                       /*  if(aiShipsPlace.boats > 0){
+                             document.getElementById(playerTime+tempAiShipSpaces[index]).classList.add("boat");
+                         } else if(aiShipsPlace.ships > 0){
+                             document.getElementById(playerTime+tempAiShipSpaces[index]).classList.add("ship");
+                         } else if(aiShipsPlace.subs > 0){
+                             document.getElementById(playerTime+tempAiShipSpaces[index]).classList.add("sub");
+                         } else if(aiShipsPlace.carrier > 0){
+                             document.getElementById(playerTime+tempAiShipSpaces[index]).classList.add("carrier");
+                         }  */
                     }
                     var openPositon = false;
                 }
